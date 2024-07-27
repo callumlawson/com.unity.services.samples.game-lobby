@@ -24,9 +24,6 @@ namespace LobbyRelaySample.UI
         [SerializeField]
         Sprite[] m_EmoteIcons;
 
-        [SerializeField]
-        vivox.VivoxUserHandler m_VivoxUserHandler;
-
         public bool IsAssigned => UserId != null;
         public string UserId { get; set; }
         LocalPlayer m_LocalPlayer;
@@ -41,8 +38,6 @@ namespace LobbyRelaySample.UI
             SetUserStatus(localPlayer.UserStatus.Value);
             SetDisplayName(m_LocalPlayer.DisplayName.Value);
             SubscribeToPlayerUpdates();
-
-            m_VivoxUserHandler.SetId(UserId);
         }
 
         void SubscribeToPlayerUpdates()

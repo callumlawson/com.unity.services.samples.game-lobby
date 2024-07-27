@@ -50,10 +50,6 @@ namespace LobbyRelaySample
         LocalPlayer m_LocalUser;
         LocalLobby m_LocalLobby;
 
-        vivox.VivoxSetup m_VivoxSetup = new vivox.VivoxSetup();
-        [SerializeField]
-        List<vivox.VivoxUserHandler> m_vivoxUserHandlers;
-
         LobbyColor m_lobbyColorFilter;
 
         static GameManager m_GameManagerInstance;
@@ -293,7 +289,6 @@ namespace LobbyRelaySample
 
             await InitializeServices();
             AuthenticatePlayer();
-            StartVivoxLogin();
         }
 
         async Task InitializeServices()
@@ -366,7 +361,6 @@ namespace LobbyRelaySample
             await LobbyManager.BindLocalLobbyToRemote(m_LocalLobby.LobbyID.Value, m_LocalLobby);
             m_LocalLobby.LocalLobbyState.onChanged += OnLobbyStateChanged;
             SetLobbyView();
-            StartVivoxJoin();
         }
 
         public void LeaveLobby()
@@ -376,36 +370,7 @@ namespace LobbyRelaySample
             LobbyManager.LeaveLobbyAsync();
 #pragma warning restore 4014
             ResetLocalLobby();
-            m_VivoxSetup.LeaveLobbyChannel();
             LobbyList.Clear();
-        }
-
-        void StartVivoxLogin()
-        {
-            m_VivoxSetup.Initialize(m_vivoxUserHandlers, OnVivoxLoginComplete);
-
-            void OnVivoxLoginComplete(bool didSucceed)
-            {
-                if (!didSucceed)
-                {
-                    Debug.LogError("Vivox login failed! Retrying in 5s...");
-                    StartCoroutine(RetryConnection(StartVivoxLogin, m_LocalLobby.LobbyID.Value));
-                }
-            }
-        }
-
-        void StartVivoxJoin()
-        {
-            m_VivoxSetup.JoinLobbyChannel(m_LocalLobby.LobbyID.Value, OnVivoxJoinComplete);
-
-            void OnVivoxJoinComplete(bool didSucceed)
-            {
-                if (!didSucceed)
-                {
-                    Debug.LogError("Vivox connection failed! Retrying in 5s...");
-                    StartCoroutine(RetryConnection(StartVivoxJoin, m_LocalLobby.LobbyID.Value));
-                }
-            }
         }
 
         IEnumerator RetryConnection(Action doConnection, string lobbyId)
